@@ -47,7 +47,7 @@ The application follows the classic linear Naive RAG pipeline:
 
 1. **Strict Context Grounding:** The system prompt explicitly restricts the LLM to facts present in the retrieved chunks.
 2. **Abstention Mechanism (Handling Missing Information):** If a question asks about details not present in the CV, the system refuses to answer and outputs `"This information is not available in the CV."` rather than hallucinating.
-3. **Dual Interface Support:** Can be executed via an interactive Jupyter Notebook (`naive_rag_cv.ipynb`) or through a command-line interface (`main.py`).
+3. **CLI Interface Support:** Can be executed via a standalone terminal interface (`main.py`) supporting both continuous interactive dialogue and single-query execution.
 4. **Automated Evaluation Suite:** 13 test cases covering in-scope, out-of-scope, and edge questions with latency and chunk diagnostics.
 
 ---
@@ -73,8 +73,7 @@ cv-rag-app/
 ├── data/
 │   ├── Youssef_Sayed-CV.pdf   # Primary CV document (PDF format)
 │   └── youssef_cv.txt         # Plain text version for fallback
-├── naive_rag_cv.ipynb         # Main Jupyter Notebook with step-by-step pipeline & evaluation
-├── main.py                    # Standalone CLI interface (interactive and single-query)
+├── main.py                    # Standalone application (interactive & single-query mode)
 ├── requirements.txt           # Python package dependencies
 ├── .env.example               # Template for environment variables (OpenAI API key)
 ├── .gitignore                 # Prevents committing secrets (.env) and caches
@@ -87,7 +86,7 @@ cv-rag-app/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/cv-rag-app.git
+git clone https://github.com/Youssef12as/cv-rag-app.git
 cd cv-rag-app
 ```
 
@@ -123,23 +122,12 @@ OPENAI_API_KEY=sk-your-actual-api-key-here
 
 ## How to Run
 
-### Option A: Jupyter Notebook (Recommended for Evaluation)
-Start Jupyter Notebook or Jupyter Lab:
-```bash
-jupyter notebook naive_rag_cv.ipynb
-```
-Run all cells sequentially:
-- **Sections 1–4:** Load, chunk, embed, and index the CV.
-- **Section 5:** Build the LCEL RAG chain.
-- **Section 6–7:** Run the evaluation test suite across in-scope, out-of-scope, and edge questions.
-- **Section 8:** View the tabulated evaluation summary with latencies.
-
-### Option B: Terminal / CLI Interface
-**Interactive Shell:**
+### Interactive Shell
+Launch the interactive command-line interface:
 ```bash
 python main.py
 ```
-*Prompt:*
+*Example session:*
 ```
 Ask a question: What university does Youssef attend?
 Answer:
@@ -150,7 +138,8 @@ Answer:
 This information is not available in the CV.
 ```
 
-**Single-Query Mode:**
+### Single-Query Mode
+Execute a one-shot query directly from the terminal:
 ```bash
 python main.py "What are Youssef's main projects?"
 ```
@@ -194,9 +183,3 @@ As instructed in the assignment specification:
 - **No Contextual Compression:** Chunks are retrieved and provided as intact passages.
 
 ---
-
-## Author
-
-**Youssef Sayed**  
-Computer Engineering, Cairo University  
-Email: youssefnafady492@gmail.com
