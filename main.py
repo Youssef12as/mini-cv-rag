@@ -1,15 +1,37 @@
 import os
 import sys
+import warnings
+
+# Suppress deprecation and library warnings for clean CLI output
+warnings.filterwarnings("ignore")
+
 from dotenv import load_dotenv
 
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+# Support both modern and legacy LangChain import paths
+try:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+except ImportError:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import Chroma
-from langchain.prompts import ChatPromptTemplate
+
+try:
+    from langchain_chroma import Chroma
+except ImportError:
+    from langchain_community.vectorstores import Chroma
+
+try:
+    from langchain_core.prompts import ChatPromptTemplate
+except ImportError:
+    from langchain.prompts import ChatPromptTemplate
+
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 load_dotenv()
 
 PROMPT_TEMPLATE = """You are an assistant answering questions about Youssef Sayed's CV.
@@ -27,8 +49,8 @@ Answer:"""
 
 
 def load_cv_documents():
-    pdf_path = os.path.join("data", "Youssef_Sayed-CV.pdf")
-    txt_path = os.path.join("data", "youssef_cv.txt")
+    pdf_path = os.path.join(BASE_DIR, "data", "Youssef_Sayed-CV.pdf")
+    txt_path = os.path.join(BASE_DIR, "data", "youssef_cv.txt")
 
     if os.path.exists(pdf_path):
         loader = PyPDFLoader(pdf_path)
@@ -43,8 +65,8 @@ def load_cv_documents():
 def build_naive_rag_chain():
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        print("Error: OPENAI_API_KEY environment variable not set.")
-        print("Please create a .env file containing: OPENAI_API_KEY=your_key_here")
+        print("\n[!] Error: OPENAI_API_KEY environment variable not set.")
+        print("Please create a .env file containing: OPENAI_API_KEY=your_key_here\n")
         sys.exit(1)
 
     documents = load_cv_documents()
