@@ -1,0 +1,23 @@
+# API Keys and Secrets
+.env
+*.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Vector Store persistence / cache
+chroma_db/
+*.chroma
+.chroma/
+
+# OS specific
+.DS_Store
+Thumbs.db
