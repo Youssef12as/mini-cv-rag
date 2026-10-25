@@ -2,10 +2,8 @@ import os
 import sys
 import warnings
 
-# Suppress library warnings for clean CLI output
-warnings.filterwarnings("ignore")
 
-# Ensure UTF-8 output on Windows consoles
+warnings.filterwarnings("ignore")
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -46,12 +44,12 @@ def load_cv_documents():
 
 
 # =====================================================================
-# TASK 2: PRE-RETRIEVAL TECHNIQUE -> Multi-Query Expansion
+#PRE-RETRIEVAL TECHNIQUE -> Multi-Query Expansion
 #
 # WHY CHOSEN:
 # Recruiter and interview questions often use generalized terminology
-# (e.g., "backend frameworks" or "cybersecurity"), while the CV lists
-# concrete names (e.g., "FastAPI, Flask, Node.js", "deepfake detection").
+# ("backend frameworks" or "cybersecurity"), while the CV lists
+# concrete names ("FastAPI, Flask, Node.js", "deepfake detection")
 # Multi-query expansion generates 3 complementary search formulations,
 # solving the "Vocabulary Mismatch" problem and maximizing retrieval recall.
 # =====================================================================
@@ -109,7 +107,7 @@ def build_pipeline():
     )
 
     # =====================================================================
-    # TASK 2: POST-RETRIEVAL TECHNIQUE -> Maximal Marginal Relevance (MMR)
+    #POST-RETRIEVAL TECHNIQUE -> Maximal Marginal Relevance (MMR)
     #
     # WHY CHOSEN:
     # In a compact CV, standard top-K cosine similarity often retrieves
@@ -152,26 +150,24 @@ def query_advanced(pipeline, question: str, verbose: bool = False):
     prompt = pipeline["prompt"]
     format_docs = pipeline["format_docs"]
 
-    # Step 1: Pre-retrieval Multi-Query Expansion
+
     expanded_queries = expand_query(question, llm)
     if verbose:
         print("\n[Pre-Retrieval: Multi-Query Expansion]")
         for i, q in enumerate(expanded_queries, 1):
             print(f"  {i}. {q}")
 
-    # Step 2: Post-retrieval MMR Search with Deduplication
+
     seen_texts = set()
     retrieved_docs = []
     for q in expanded_queries:
         docs = mmr_retriever.invoke(q)
         for doc in docs:
-            # Deduplicate by first 100 characters to catch slight overlap
             fingerprint = doc.page_content[:100].strip()
             if fingerprint not in seen_texts:
                 seen_texts.add(fingerprint)
                 retrieved_docs.append(doc)
 
-    # Select top 4 diverse chunks
     final_docs = retrieved_docs[:4]
 
     if verbose:
@@ -180,7 +176,7 @@ def query_advanced(pipeline, question: str, verbose: bool = False):
             snippet = d.page_content[:90].replace("\n", " ")
             print(f"  Chunk {i}: {snippet}...")
 
-    # Step 3: Generation
+
     context_str = format_docs(final_docs)
     gen_chain = prompt | llm | StrOutputParser()
     answer = gen_chain.invoke({"context": context_str, "question": question})
@@ -209,7 +205,7 @@ def compare_pipelines(pipeline, question: str):
     print("\nNaive Answer:")
     print(naive_answer)
 
-    # 2. Run Advanced RAG (Task 2)
+    # 2. Run Advanced RAG
     advanced_res = query_advanced(pipeline, question, verbose=True)
 
     print("\nAdvanced Answer (Pre-retrieval Expansion + Post-retrieval MMR):")
